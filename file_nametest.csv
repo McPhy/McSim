@@ -1,6 +1,0 @@
-No;NAME;DB;Address Byte;Address Bit;DataType
-5;Comp_Authorisation;1586;0;5;BOOL
-6;GEMMA_Mode_Utilities;1586;0;6;BOOL
-7;GEMMA_Mode_Stop;1586;0;7;BOOL
-8;GEMMA_Mode_Offline;1586;1;0;BOOL
-9;GEMMA_Mode_Normal;1586;1;1;BOOL
