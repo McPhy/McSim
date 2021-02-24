@@ -16,21 +16,26 @@ from opcua import *
 from opcua import Client
 
 
-
+#interface to search for xlsx file
 Surf  = Tk()
 Surf.withdraw()
 file_path = filedialog.askopenfilename()
 
+#export xlsx file to dataframe
 df = pd.read_excel(file_path, sheet_name ='Sheet1', header=0)
 
+#main interface interface
 if file_path :
     root = Toplevel()
     root.title('MyApp')
     #root.geometry("400x400")
 
+#global variabals
 myplc = None
 client = None
 
+
+#a function to connect PLCs after pressing the connect button
 def connect_plc() :
     for i in range (len(df['PLC'])) :
         if clicked.get() == df['PLC'][i] :  
@@ -51,6 +56,7 @@ def connect_plc() :
                 print("Client Connected")
                 print('\n')
 
+#a function to disconnect PLCs after pressing the disconnect button
 def disconnect_plc() :
     global myplc
     global client
@@ -70,20 +76,22 @@ def disconnect_plc() :
 
 
 
-
+#loading PLC list from dataframe into the OptionMenu
 options = df['PLC']
 clicked = StringVar()
 clicked.set(options[0])
 
+#global frame that contains two subframes
 global_frame = LabelFrame(root, text="McSim", padx=10, pady=10)
 global_frame.pack(padx=10, pady=10)
 
+#first subframe which contains the OptionMenu
 frame_plc = LabelFrame(global_frame, text="PLCs", padx=40, pady=40)
 drop = OptionMenu(frame_plc, clicked, *options)
 drop.pack(pady=10)
 
+#second subframe which contains the buttons
 frame_buttons = LabelFrame(global_frame, text="COM", padx=40, pady=40)
-
 Connect = Button(frame_buttons, text="Connect", command=connect_plc)
 Disonnect = Button(frame_buttons, text="Disonnect", command=disconnect_plc)
 
