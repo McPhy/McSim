@@ -7,20 +7,20 @@ import numpy as np
 import tkinter as tk
 from tkinter import filedialog
 
+
+#interface to search for xlsx file
 root  = tk.Tk()
 root.withdraw()
-
-#this is a comment hhhwwww
-
 file_path = filedialog.askopenfilename()
 print(file_path)
 
-
+#export xlsx file to dataframe
 df = pd.read_excel(file_path, sheet_name ='Sheet1', header=0)
 
+#create a txt file
 f = open("WalidProjet.txt", "a", encoding="utf-8")
 
-
+#writing the columns heads on the txt file
 for i in range(len(df.columns)) :
 	if i < len(df.columns) - 1 :
 		f.write(df.columns[i])
@@ -29,7 +29,7 @@ for i in range(len(df.columns)) :
 
 f.write("\n")
 
-
+#writing the rows on the created txt file
 for j in range(len(df['"Id"'])) :
 	for i in range(len(df.columns)) :
 		if pd.notna(df[df.columns[i]][j]) :
