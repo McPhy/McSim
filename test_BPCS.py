@@ -17,13 +17,15 @@ from tkinter import filedialog
 b = 0
 tmp = 1
 step  = 40
-CMD = 0
+CMD = 0 
 CMD_V = False
 adressByte = []
 adressBit = []
 dataType = []
 dataName = []
 
+
+#function to write on DataBlocks
 def WriteDBlock(plc,DBlock,byte,bit,datatype,value):
 	result = plc.read_area(areas['DB'],DBlock,byte,datatype)
 	if datatype == S7WLBit:
@@ -36,42 +38,40 @@ def WriteDBlock(plc,DBlock,byte,bit,datatype,value):
 		set_dword(result,0,value)
 	plc.write_area(areas['DB'],DBlock,byte,result)
 
-
+#establishing theconnection between the client and the server
 myplc = snap7.client.Client()
 myplc.connect('192.168.0.100',0,2) #adress, rack et slot in server 
-
 print(myplc.get_connected())
-
 APIstatus = myplc.get_cpu_state()
 print("The Status of PLC is: " + APIstatus)
 print("\n")
 
 #Excel_file_name = input("Please enter the Excel file name:\n")
 
+#interface to search for xlsx file
 root  = tk.Tk()
 root.withdraw()
-
 file_path = filedialog.askopenfilename()
 
+#export xlsx file to dataframe
 df = pd.read_excel(file_path, sheet_name ='Sheet1', header=0)
-#df = pd.read_excel(Excel_file_name, sheet_name ='Sheet1', header=0)
-#b = 0
+
+#setting the simulation variables to True
 for i in range(len(df['NAME'])):
 	if df['NAME'][i].find("Mode", 0, 4) != -1 :
 		WriteDBlock(myplc,1586,int(df['Address Byte'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
-		#print(b, i, df['NAME'][i], int(df['Address Byte'][i]), df['Address Bit'][i])
 
+#filtering the command variables
 for i in range(len(df['NAME'])):
 	if df['NAME'][i].find("CMD", 0, 3) != -1 :
 		adressByte.append(df['Address Byte'][i])
 		adressBit.append(df['Address Bit'][i])
 		dataType.append(df['DataType'][i])
 		dataName.append(df['NAME'][i])
-		# print(i, b, dataName[b], adressByte[b], adressBit[b], dataType[b])
-		# b = b + 1
 
 try :
 	while True :
+		#incrementing the variables
 		if CMD <= 400 and tmp == 1:
 			for x in range(0,10) :
 				CMD = CMD + step
@@ -82,9 +82,8 @@ try :
 						WriteDBlock(myplc,1586,int(adressByte[i]), int(adressBit[i]), S7WLReal, CMD)
 					elif dataType[i] == "BOOL":
 						WriteDBlock(myplc,1586,int(adressByte[i]), int(adressBit[i]), S7WLBit, CMD_V)					
-						#print(b, i, df['NAME'][i], int(df['Address Byte'][i]), df['Address Bit'][i])
 				if CMD == 400 : tmp = 0
-
+		#decrementing the variables
 		if CMD >= 0 and tmp == 0 :
 			for x in range(0,10) :
 				CMD = CMD - step
@@ -95,10 +94,10 @@ try :
 						WriteDBlock(myplc,1586,int(adressByte[i]), int(adressBit[i]), S7WLReal, CMD)
 					elif dataType[i] == "BOOL":
 						WriteDBlock(myplc,1586,int(adressByte[i]), int(adressBit[i]), S7WLBit, CMD_V)
-						#print(b, i, df['NAME'][i], int(df['Address Byte'][i]), df['Address Bit'][i])
 				if CMD == 0 : tmp = 1
 
 except KeyboardInterrupt:
+	#reset all the variables to 0
 	for i in range(len(df['NAME'])):
 		if df['NAME'][i].find("Mode", 0, 4) != -1 :
 			WriteDBlock(myplc,1586,int(df['Address Byte'][i]), int(df['Address Bit'][i]), S7WLBit, 0)
