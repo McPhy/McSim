@@ -27,7 +27,8 @@ df = pd.read_excel(file_path, sheet_name ='Sheet1', header=0)
 #main interface interface
 if file_path :
     root = Toplevel()
-    root.title('MyApp')
+    root.title("McSim Simulation APP")          # Add Tittle to Root Window
+    root.iconbitmap(r'mcsimicon.ico')           # Logo Setup for Root Window
     #root.geometry("400x400")
 
 #global variabals
