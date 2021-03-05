@@ -126,15 +126,18 @@ fast_simulation = Checkbutton(global_frame, text = "Fast simulation")
 advanced_simulation = Checkbutton(global_frame, text = "Advanced simulation")
 
 # Entries' labels
-label_var = StringVar()
-label_min_value = Label( frame_projects, textvariable=label_var)
-label_var.set("Min value :")
+label_var_min = StringVar()
+label_var_step = StringVar()
+label_var_max = StringVar()
 
-label_step_value = Label( frame_projects, textvariable=label_var)
-label_var.set("Step value :")
+label_min_value = Label( frame_projects, textvariable=label_var_min)
+label_var_min.set("Min value :")
 
-label_max_value = Label( frame_projects, textvariable=label_var)
-label_var.set("Max value :")
+label_step_value = Label( frame_projects, textvariable=label_var_step)
+label_var_step.set("Step value :")
+
+label_max_value = Label( frame_projects, textvariable=label_var_max)
+label_var_max.set("Max value :")
 
 #Fourth subframe
 unknown_frame = LabelFrame(global_frame, text = "unknown frame", labelanchor="n", padx=40, pady=40)
