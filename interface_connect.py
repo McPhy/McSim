@@ -16,20 +16,16 @@ from opcua import *
 from opcua import Client
 
 
-#interface to search for xlsx file
-Surf  = Tk()
-Surf.withdraw()
-file_path = filedialog.askopenfilename()
-
 #export xlsx file to dataframe
-df = pd.read_excel(file_path, sheet_name ='Sheet1', header=0)
+df = pd.read_excel('MCSIM APP Database.xlsx', sheet_name ='Sheet1', header=0)
 
 #main interface interface
-if file_path :
-    root = Toplevel()
-    root.title("McSim Simulation APP")          # Add Tittle to Root Window
-    root.iconbitmap(r'mcsimicon.ico')           # Logo Setup for Root Window
-    #root.geometry("400x400")
+root = Tk()
+root.title("McSim Simulation APP")          # Add Tittle to Root Window
+root.iconbitmap(r'mcsimicon.ico')           # Logo Setup for Root Window
+#root.geometry("400x400")
+
+df = pd.read_excel(r'C:\Users\admin\Desktop\McSim\MCSIM APP Database.xlsx', sheet_name ='Sheet1', header=0)
 
 #global variabals
 myplc = None
@@ -38,60 +34,157 @@ client = None
 
 #a function to connect PLCs after pressing the connect button
 def connect_plc() :
-    for i in range (len(df['PLC'])) :
-        if clicked.get() == df['PLC'][i] :  
-            if df['Protocol'][i] == "Snap7" :
-                global myplc
-                myplc = snap7.client.Client()
-                myplc.connect(df['IP Address'][i],0,2) #adress, rack et slot in server 
-                print(myplc.get_connected())
-                APIstatus = myplc.get_cpu_state()
-                print("The Status of PLC is: " + APIstatus)
-                print("\n")
+    global client
+    global myplc
+    if clicked.get() == "BPCS/PSD" :
+        myplc = snap7.client.Client()
+        myplc.connect('192.168.0.100',0,2) #adress, rack et slot in server 
+        print(myplc.get_connected())
+        APIstatus = myplc.get_cpu_state()
+        print("The Status of PLC is: " + APIstatus)
+        print("\n")
 
-            elif df['Protocol'][i] == "OPCUA" :
-                global client
-                url = "opc.tcp://"+df['IP Address'][i]+":4840"
-                client = Client(url)
-                client.connect()
-                print("Client Connected")
-                print('\n')
+    elif clicked.get() == "SIS" :
+        url = "opc.tcp://192.168.0.105:4840"
+        client = Client(url)
+        client.connect()
+        print("Client Connected")
+        print('\n')
+
+    elif clicked.get() == "ESD" :
+        url = "opc.tcp://192.168.0.104:4840"
+        client = Client(url)
+        client.connect()
+        print("Client Connected")
+        print('\n')
 
 #a function to disconnect PLCs after pressing the disconnect button
 def disconnect_plc() :
     global myplc
     global client
-    for i in range (len(df['PLC'])) :
-        if clicked.get() == df['PLC'][i] :
-            if df['Protocol'][i] == "Snap7" :
-                if myplc.get_connected() :
-                    myplc.disconnect()
-                    print(myplc.get_connected())
-                    APIstatus = myplc.get_cpu_state()
-                    print("The Status of PLC is: " + APIstatus)
-                    print("\n")
+    if clicked.get() == "BPCS/PSD" :
+        if myplc.get_connected() :
+            myplc.disconnect()
+            print(myplc.get_connected())
+            APIstatus = myplc.get_cpu_state()
+            print("The Status of PLC is: " + APIstatus)
+            print("\n")
 
-            elif df['Protocol'][i] == "OPCUA" :
-                client.disconnect()
-                print("Client Disconnected")
+    elif clicked.get() == "SIS" :
+        client.disconnect()
+        print("Client Disconnected")
+
+    elif clicked.get() == "ESD" :
+        client.disconnect()
+        print("Client Disconnected")
+
+def ramp_function() :
+    CMD = 0
+    tmp = True
+    CMD_V = False
+    global var_fast_simulation
+    if var_fast_simulation.get() :
+        if myplc.get_connected() :
+            min_value = float(text_min_value.get())
+            step = float(text_step_value.get())
+            max_value = float(text_max_value.get())
+            range_inc = int((max_value - min_value)/step)
+            CMD = min_value
+            for y in range(1) :
+                if CMD <= max_value and tmp == 1:
+                    for x in range(0,range_inc + 1) :
+                        if CMD_V == False : CMD_V = True
+                        elif CMD_V == True : CMD_V = False
+                        for i in range(len(df['NAME'])):
+                            if df['H2M'][i] == "YES" :
+                                if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                                    if df['DataType'][i] == "REAL" :
+                                        WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
+
+                                    elif df['DataType'][i] == "BOOL" :
+                                        WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
+                        if CMD == max_value : tmp = 0
+                        CMD = CMD + step
+
+                if CMD >= min_value and tmp == 0 :
+                    for x in range(0,range_inc + 1) :
+                        CMD = CMD - step
+                        if CMD_V == False : CMD_V = True
+                        elif CMD_V == True : CMD_V = False
+                        for i in range(len(df['NAME'])):
+                            if df['H2M'][i] == "YES" :
+                                if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                                    if df['DataType'][i] == "REAL" :
+                                        WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
+                                    elif df['DataType'][i] == "BOOL":
+                                        WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit , CMD_V)
+                        if CMD == min_value : tmp = 1
+
+
+def toggle_function() :
+    global myplc
+    b = 0
+    global var_fast_simulation
+    if var_fast_simulation.get() :
+        if myplc.get_connected() :
+            if clicked_projects.get() == "HRS H2M" :
+                for i in range(len(df['NAME'])):
+                    if df['H2M'][i] == "YES" :
+                        if df['NAME'][i].find("Mode", 0, 4) != -1 :
+                            WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
+                        if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                            if df['DataType'][i] == "BOOL" :
+                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
+                            if df['DataType'][i] == "REAL" :
+                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 1)
+
+            if clicked_projects.get() == "HRS IP1" :
+                for i in range(len(df['NAME'])):
+                    if df['IP1'][i] == "YES" :
+                        if df['NAME'][i].find("Mode", 0, 4) != -1 :
+                            WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
+                        if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                            if df['DataType'][i] == "BOOL" :
+                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
+                            if df['DataType'][i] == "REAL" :
+                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 1)
+
+
+
+def WriteDBlock(plc,DBlock,byte,bit,datatype,value):
+    result = plc.read_area(areas['DB'],DBlock,byte,datatype)
+    if datatype == S7WLBit:
+        set_bool(result,0,bit,value)
+    elif datatype == S7WLByte or datatype == S7WLWord:
+        set_int(result,0,value)
+    elif datatype == S7WLReal:
+        set_real(result,0,value)
+    elif datatype == S7WLDWord:
+        set_dword(result,0,value)
+    plc.write_area(areas['DB'],DBlock,byte,result)
 
 
 
 #loading PLC list from dataframe into the OptionMenu
-options = df['PLC']
+options = ['BPCS/PSD',
+            'SIS',
+            'ESD',
+            ]
 clicked = StringVar()
 clicked.set(options[0])
 
 projects = ['HRS CNR',
             'HRS H2M',
             'HRS IP1',
-            'HRS APEX',]
+            'HRS APEX',
+            ]
 clicked_projects = StringVar()
 clicked_projects.set('Select a project')
 
 concepts = ['Sensors',
             'Actuators',
-            'Alarms/Defaults',]
+            'Alarms/Defaults',
+            ]
 clicked_concepts = StringVar()
 clicked_concepts.set('Concepts')
 
@@ -117,12 +210,14 @@ Disonnect = Button(frame_buttons, text="Disonnect", command=disconnect_plc, widt
 #Third subframe which contains the buttons
 frame_projects = LabelFrame(global_frame, labelanchor="n", padx=40, pady=40)
 #frame_projects.config(width = 800, height = 300)
-toggle = Button(frame_projects, text="Toggle function", command=connect_plc, width=20)
-ramp = Button(frame_projects, text="Ramp function", command=disconnect_plc, width=20)
+toggle = Button(frame_projects, text="Toggle function", command=toggle_function, width=20)
+ramp = Button(frame_projects, text="Ramp function", command=ramp_function, width=20)
+
 text_min_value = Entry(frame_projects)
 text_max_value = Entry(frame_projects)
 text_step_value = Entry(frame_projects)
-fast_simulation = Checkbutton(global_frame, text = "Fast simulation")
+var_fast_simulation = IntVar()
+fast_simulation = Checkbutton(global_frame, text = "Fast simulation", variable = var_fast_simulation)
 advanced_simulation = Checkbutton(global_frame, text = "Advanced simulation")
 
 # Entries' labels
@@ -171,9 +266,21 @@ frame_plc.place(x=10, y=10)
 frame_buttons.place(x=300, y=10)
 frame_projects.place(x=200, y=200)
 projects_menu.place(x=10, y=200)
-concepts_menu.place(x=10, y=300)
+concepts_menu.place(x=10, y=375)
 fast_simulation.place(x=200, y=170)
 advanced_simulation.place(x=200, y=350)
 unknown_frame.place(x=200, y=370)
+
+# projects_menu.grid(row=1, column=0)
+# concepts_menu.grid(row=2, column=0)
+# fast_simulation.grid(row=1, column=1)
+# adnaced_simulation.grid(row=3, column=1)
+
+
+
+# frame_plc.grid(row=0, column=0)
+# frame_buttons.grid(row=0, column=1)
+# frame_projects.grid(row=2, column=1)
+# unknown_frame.grid(row=4, column=1, columnspan=2)
 
 root.mainloop()
