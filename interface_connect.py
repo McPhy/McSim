@@ -78,6 +78,7 @@ def disconnect_plc() :
         client.disconnect()
         print("Client Disconnected")
 
+#Ramp function call if the the button ramp function is pusshed
 def ramp_function() :
     CMD = 0
     tmp = True
@@ -100,7 +101,6 @@ def ramp_function() :
                                 if df['NAME'][i].find("CMD", 0, 3) != -1 :
                                     if df['DataType'][i] == "REAL" :
                                         WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
-
                                     elif df['DataType'][i] == "BOOL" :
                                         WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
                         if CMD == max_value : tmp = 0
@@ -121,6 +121,7 @@ def ramp_function() :
                         if CMD == min_value : tmp = 1
 
 
+#Toggle function call if the the button toggle function is pusshed
 def toggle_function() :
     global myplc
     b = 0
