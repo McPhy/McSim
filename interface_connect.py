@@ -97,12 +97,22 @@ def ramp_function() :
                         if CMD_V == False : CMD_V = True
                         elif CMD_V == True : CMD_V = False
                         for i in range(len(df['NAME'])):
-                            if df['H2M'][i] == "YES" :
-                                if df['NAME'][i].find("CMD", 0, 3) != -1 :
-                                    if df['DataType'][i] == "REAL" :
-                                        WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
-                                    elif df['DataType'][i] == "BOOL" :
-                                        WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
+                            if clicked_projects.get() == "HRS H2M" :
+                                if df['H2M'][i] == "YES" :
+                                    if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                                        if df['DataType'][i] == "REAL" :
+                                            WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
+                                        elif df['DataType'][i] == "BOOL" :
+                                            WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
+                            
+                            elif clicked_projects.get() == "HRS IP1" :
+                                if df['H2M'][i] == "YES" :
+                                    if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                                        if df['DataType'][i] == "REAL" :
+                                            WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
+                                        elif df['DataType'][i] == "BOOL" :
+                                            WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
+                            
                         if CMD == max_value : tmp = 0
                         CMD = CMD + step
 
@@ -112,13 +122,31 @@ def ramp_function() :
                         if CMD_V == False : CMD_V = True
                         elif CMD_V == True : CMD_V = False
                         for i in range(len(df['NAME'])):
-                            if df['H2M'][i] == "YES" :
-                                if df['NAME'][i].find("CMD", 0, 3) != -1 :
-                                    if df['DataType'][i] == "REAL" :
-                                        WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
-                                    elif df['DataType'][i] == "BOOL":
-                                        WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit , CMD_V)
+                            if clicked_projects.get() == "HRS H2M" :
+                                if df['H2M'][i] == "YES" :
+                                    if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                                        if df['DataType'][i] == "REAL" :
+                                            WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
+                                        elif df['DataType'][i] == "BOOL" :
+                                            WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
+                            
+                            elif clicked_projects.get() == "HRS IP1" :
+                                if df['H2M'][i] == "YES" :
+                                    if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                                        if df['DataType'][i] == "REAL" :
+                                            WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
+                                        elif df['DataType'][i] == "BOOL" :
+                                            WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
                         if CMD == min_value : tmp = 1
+                    
+            for i in range(len(df['NAME'])):
+                if df['NAME'][i].find("Mode", 0, 4) != -1 :
+                    WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 0)
+                elif df['NAME'][i].find("CMD", 0, 3) != -1 :
+                    if df['DataType'][i] == "BOOL" :
+                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 0)
+                    if df['DataType'][i] == "REAL" :
+                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 0)
 
 
 #Toggle function call if the the button toggle function is pusshed
