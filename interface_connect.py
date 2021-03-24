@@ -275,6 +275,63 @@ def toggle_function() :
 
 
 
+def rearm() :
+    if clicked.get() == "ESD" :
+        for i in range(len(df['NAME'])):
+            if df['PLC'][i] == 'ESD' :
+                temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+                if df['DataType'][i] == 'BOOL' :
+                    if df['NAME'][i] == 'DIF_RMP_station_1' or df['NAME'][i] == 'DIF_RMP_station_2' or df['NAME'][i] == 'DIF_BP_rearm_ESD' :
+                        dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+                        dv.ServerTimestamp = None
+                        dv.SourceTimestamp = None
+                        temp_var.set_value(dv)
+                    else :
+                        dv = ua.DataValue(ua.Variant(1, ua.VariantType.Boolean))
+                        dv.ServerTimestamp = None
+                        dv.SourceTimestamp = None
+                        temp_var.set_value(dv)
+
+                elif df['DataType'][i] == 'INT' :
+                    if df['NAME'][i].find("TT") != -1 :
+                        dv = ua.DataValue(ua.Variant(4200, ua.VariantType.Int16))
+                        dv.ServerTimestamp = None
+                        dv.SourceTimestamp = None
+                        temp_var.set_value(dv)
+
+                    if df['NAME'][i].find("PT") != -1 :
+                        dv = ua.DataValue(ua.Variant(27500, ua.VariantType.Int16))
+                        dv.ServerTimestamp = None
+                        dv.SourceTimestamp = None
+                        temp_var.set_value(dv)
+
+                    if df['NAME'][i].find("DG") != -1 :
+                        dv = ua.DataValue(ua.Variant(1200, ua.VariantType.Int16))
+                        dv.ServerTimestamp = None
+                        dv.SourceTimestamp = None
+                        temp_var.set_value(dv)
+
+                # elif df['DataType'][i] == 'REAL' :
+                #     dv = ua.DataValue(ua.Variant(1, ua.VariantType.Float))
+                #     dv.ServerTimestamp = None
+                #     dv.SourceTimestamp = None
+                #     temp_var.set_value(dv)
+
+        sleep(0.5)
+
+        for i in range(2386, len(df['NAME'])) :
+            if df['NAME'][i] == 'DIF_BP_rearm_ESD' :
+                temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+                dv = ua.DataValue(ua.Variant(1, ua.VariantType.Boolean))
+                dv.ServerTimestamp = None
+                dv.SourceTimestamp = None
+                temp_var.set_value(dv)
+
+        sleep(0.5)
+        for i in range(2386, len(df['NAME'])) :
+            temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+            print(i, temp_var, "==========>" , temp_var.get_value())
+
 def WriteDBlock(plc,DBlock,byte,bit,datatype,value):
     result = plc.read_area(areas['DB'],DBlock,byte,datatype)
     if datatype == S7WLBit:
@@ -333,10 +390,10 @@ Disonnect = Button(frame_buttons, text="Disonnect", command=disconnect_plc, widt
 
 #Third subframe which contains the buttons
 frame_projects = LabelFrame(global_frame, labelanchor="n", padx=40, pady=40)
+
 #frame_projects.config(width = 800, height = 300)
 toggle = Button(frame_projects, text="Toggle function", command=toggle_function, width=20)
 ramp = Button(frame_projects, text="Ramp function", command=ramp_function, width=20)
-
 text_min_value = Entry(frame_projects)
 text_max_value = Entry(frame_projects)
 text_step_value = Entry(frame_projects)
@@ -359,17 +416,16 @@ label_max_value = Label( frame_projects, textvariable=label_var_max)
 label_var_max.set("Max value :")
 
 #Fourth subframe
-unknown_frame = LabelFrame(global_frame, text = "unknown frame", labelanchor="n", padx=40, pady=40)
-unknown_frame.config(width = 665, height = 150)
+ESD_frame = LabelFrame(global_frame, text = "ESD", labelanchor="n", padx=40, pady=40)
+ESD_frame.config(width = 665, height = 150)
+rarmement = Button(ESD_frame, text="Rearmement", command=rearm, width=20)
+
 
 #OptionMenus
 projects_menu = OptionMenu(global_frame, clicked_projects, *projects)
 projects_menu.config(width=20)
 concepts_menu = OptionMenu(global_frame, clicked_concepts, *concepts)
 concepts_menu.config(width=20)
-
-
-
 
 
 
@@ -385,7 +441,7 @@ text_max_value.grid(row=1, column=4, padx=10)
 label_min_value.grid(row=0, column=2, padx=10)
 label_step_value.grid(row=0, column=3, padx=10)
 label_max_value.grid(row=0, column=4, padx=10)
-
+armement.grid(row=0, column=0)
 frame_plc.place(x=10, y=10)
 frame_buttons.place(x=300, y=10)
 frame_projects.place(x=200, y=200)
@@ -393,18 +449,6 @@ projects_menu.place(x=10, y=200)
 concepts_menu.place(x=10, y=375)
 fast_simulation.place(x=200, y=170)
 advanced_simulation.place(x=200, y=350)
-unknown_frame.place(x=200, y=370)
-
-# projects_menu.grid(row=1, column=0)
-# concepts_menu.grid(row=2, column=0)
-# fast_simulation.grid(row=1, column=1)
-# adnaced_simulation.grid(row=3, column=1)
-
-
-
-# frame_plc.grid(row=0, column=0)
-# frame_buttons.grid(row=0, column=1)
-# frame_projects.grid(row=2, column=1)
-# unknown_frame.grid(row=4, column=1, columnspan=2)
+ESD_frame.place(x=200, y=370)
 
 root.mainloop()
