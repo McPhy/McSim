@@ -107,25 +107,26 @@ def ramp_function() :
                                 
                                 elif clicked.get() == "ESD" :
                                     if df['PLC'][i] == 'ESD' :
-                                        temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
-                                        if df['DataType'][i] == 'BOOL' :
-                                                dv = ua.DataValue(ua.Variant(CMD_V, ua.VariantType.Boolean))
-                                                dv.ServerTimestamp = None
-                                                dv.SourceTimestamp = None
-                                                temp_var.set_value(dv)
+                                        if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
+                                            temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+                                            if df['DataType'][i] == 'BOOL' :
+                                                    dv = ua.DataValue(ua.Variant(CMD_V, ua.VariantType.Boolean))
+                                                    dv.ServerTimestamp = None
+                                                    dv.SourceTimestamp = None
+                                                    temp_var.set_value(dv)
 
-                                        elif df['DataType'][i] == 'INT' :
-                                                dv = ua.DataValue(ua.Variant(int(CMD), ua.VariantType.Int16))
-                                                dv.ServerTimestamp = None
-                                                dv.SourceTimestamp = None
-                                                temp_var.set_value(dv)
+                                            elif df['DataType'][i] == 'INT' :
+                                                    dv = ua.DataValue(ua.Variant(int(CMD), ua.VariantType.Int16))
+                                                    dv.ServerTimestamp = None
+                                                    dv.SourceTimestamp = None
+                                                    temp_var.set_value(dv)
 
-                                        elif df['DataType'][i] == 'REAL' :
-                                                dv = ua.DataValue(ua.Variant(CMD, ua.VariantType.Float))
-                                                dv.ServerTimestamp = None
-                                                dv.SourceTimestamp = None
-                                                temp_var.set_value(dv)
-                                        print(i, temp_var, "==========>" , temp_var.get_value())
+                                            elif df['DataType'][i] == 'REAL' :
+                                                    dv = ua.DataValue(ua.Variant(CMD, ua.VariantType.Float))
+                                                    dv.ServerTimestamp = None
+                                                    dv.SourceTimestamp = None
+                                                    temp_var.set_value(dv)
+                                            print(i, temp_var, "==========>" , temp_var.get_value())
                             
                             elif clicked_projects.get() == "HRS IP1" :
                                 if clicked.get() == "BPCS/PSD" :
@@ -155,25 +156,26 @@ def ramp_function() :
                                                 WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
                                 if clicked.get() == "ESD" :
                                     if df['PLC'][i] == 'ESD' :
-                                        temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
-                                        if df['DataType'][i] == 'BOOL' :
-                                                dv = ua.DataValue(ua.Variant(CMD_V, ua.VariantType.Boolean))
-                                                dv.ServerTimestamp = None
-                                                dv.SourceTimestamp = None
-                                                temp_var.set_value(dv)
+                                        if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
+                                            temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+                                            if df['DataType'][i] == 'BOOL' :
+                                                    dv = ua.DataValue(ua.Variant(CMD_V, ua.VariantType.Boolean))
+                                                    dv.ServerTimestamp = None
+                                                    dv.SourceTimestamp = None
+                                                    temp_var.set_value(dv)
 
-                                        elif df['DataType'][i] == 'INT' :
-                                                dv = ua.DataValue(ua.Variant(int(CMD), ua.VariantType.Int16))
-                                                dv.ServerTimestamp = None
-                                                dv.SourceTimestamp = None
-                                                temp_var.set_value(dv)
+                                            elif df['DataType'][i] == 'INT' :
+                                                    dv = ua.DataValue(ua.Variant(int(CMD), ua.VariantType.Int16))
+                                                    dv.ServerTimestamp = None
+                                                    dv.SourceTimestamp = None
+                                                    temp_var.set_value(dv)
 
-                                        elif df['DataType'][i] == 'REAL' :
-                                                dv = ua.DataValue(ua.Variant(CMD, ua.VariantType.Float))
-                                                dv.ServerTimestamp = None
-                                                dv.SourceTimestamp = None
-                                                temp_var.set_value(dv)
-                                        print(i, temp_var, "==========>" , temp_var.get_value())
+                                            elif df['DataType'][i] == 'REAL' :
+                                                    dv = ua.DataValue(ua.Variant(CMD, ua.VariantType.Float))
+                                                    dv.ServerTimestamp = None
+                                                    dv.SourceTimestamp = None
+                                                    temp_var.set_value(dv)
+                                            print(i, temp_var, "==========>" , temp_var.get_value())
                             
 
                             elif clicked_projects.get() == "HRS IP1" :
@@ -197,25 +199,26 @@ def ramp_function() :
             if clicked.get() == "ESD" :
                 for i in range(len(df['NAME'])):
                     if df['PLC'][i] == 'ESD' :
-                        temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
-                        if df['DataType'][i] == 'BOOL' :
-                            dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
-                            dv.ServerTimestamp = None
-                            dv.SourceTimestamp = None
-                            temp_var.set_value(dv)
+                        if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
+                            temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+                            if df['DataType'][i] == 'BOOL' :
+                                dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+                                dv.ServerTimestamp = None
+                                dv.SourceTimestamp = None
+                                temp_var.set_value(dv)
 
-                        elif df['DataType'][i] == 'INT' :
-                            dv = ua.DataValue(ua.Variant(0, ua.VariantType.Int16))
-                            dv.ServerTimestamp = None
-                            dv.SourceTimestamp = None
-                            temp_var.set_value(dv)
+                            elif df['DataType'][i] == 'INT' :
+                                dv = ua.DataValue(ua.Variant(0, ua.VariantType.Int16))
+                                dv.ServerTimestamp = None
+                                dv.SourceTimestamp = None
+                                temp_var.set_value(dv)
 
-                        elif df['DataType'][i] == 'REAL' :
-                            dv = ua.DataValue(ua.Variant(0, ua.VariantType.Float))
-                            dv.ServerTimestamp = None
-                            dv.SourceTimestamp = None
-                            temp_var.set_value(dv)
-                        print(i, temp_var, "==========>" , temp_var.get_value())
+                            elif df['DataType'][i] == 'REAL' :
+                                dv = ua.DataValue(ua.Variant(0, ua.VariantType.Float))
+                                dv.ServerTimestamp = None
+                                dv.SourceTimestamp = None
+                                temp_var.set_value(dv)
+                            print(i, temp_var, "==========>" , temp_var.get_value())
             
             
 
@@ -243,6 +246,7 @@ def toggle_function() :
             if clicked.get() == "ESD" :
                 for i in range(len(df['NAME'])):
                     if df['PLC'][i] == 'ESD' :
+                        if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
                             temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
                             if df['DataType'][i] == 'BOOL' :
                                     dv = ua.DataValue(ua.Variant(1, ua.VariantType.Boolean))
@@ -274,63 +278,142 @@ def toggle_function() :
                                 WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 1)
 
 
-
 def rearm() :
-    if clicked.get() == "ESD" :
+    if clicked.get() == "ESD" and clicked_projects.get() == "HRS H2M" :
         for i in range(len(df['NAME'])):
             if df['PLC'][i] == 'ESD' :
-                temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
-                if df['DataType'][i] == 'BOOL' :
-                    if df['NAME'][i] == 'DIF_RMP_station_1' or df['NAME'][i] == 'DIF_RMP_station_2' or df['NAME'][i] == 'DIF_BP_rearm_ESD' :
-                        dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
-                        dv.ServerTimestamp = None
-                        dv.SourceTimestamp = None
-                        temp_var.set_value(dv)
-                    else :
-                        dv = ua.DataValue(ua.Variant(1, ua.VariantType.Boolean))
-                        dv.ServerTimestamp = None
-                        dv.SourceTimestamp = None
-                        temp_var.set_value(dv)
+                if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
+                    temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+                    if df['DataType'][i] == 'BOOL' :
+                        if df['NAME'][i] == 'DIF_RMP_station_1' or df['NAME'][i] == 'DIF_RMP_station_2' or df['NAME'][i] == 'DIF_BP_rearm_ESD' :
+                            dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+                            dv.ServerTimestamp = None
+                            dv.SourceTimestamp = None
+                            temp_var.set_value(dv)
+                        else :
+                            dv = ua.DataValue(ua.Variant(1, ua.VariantType.Boolean))
+                            dv.ServerTimestamp = None
+                            dv.SourceTimestamp = None
+                            temp_var.set_value(dv)
 
-                elif df['DataType'][i] == 'INT' :
-                    if df['NAME'][i].find("TT") != -1 :
-                        dv = ua.DataValue(ua.Variant(4200, ua.VariantType.Int16))
-                        dv.ServerTimestamp = None
-                        dv.SourceTimestamp = None
-                        temp_var.set_value(dv)
+                    elif df['DataType'][i] == 'INT' :
+                        if df['NAME'][i].find("TT") != -1 :
+                            dv = ua.DataValue(ua.Variant(4200, ua.VariantType.Int16))
+                            dv.ServerTimestamp = None
+                            dv.SourceTimestamp = None
+                            temp_var.set_value(dv)
 
-                    if df['NAME'][i].find("PT") != -1 :
-                        dv = ua.DataValue(ua.Variant(27500, ua.VariantType.Int16))
-                        dv.ServerTimestamp = None
-                        dv.SourceTimestamp = None
-                        temp_var.set_value(dv)
+                        if df['NAME'][i].find("PT") != -1 :
+                            dv = ua.DataValue(ua.Variant(27500, ua.VariantType.Int16))
+                            dv.ServerTimestamp = None
+                            dv.SourceTimestamp = None
+                            temp_var.set_value(dv)
 
-                    if df['NAME'][i].find("DG") != -1 :
-                        dv = ua.DataValue(ua.Variant(1200, ua.VariantType.Int16))
-                        dv.ServerTimestamp = None
-                        dv.SourceTimestamp = None
-                        temp_var.set_value(dv)
+                        if df['NAME'][i].find("DG") != -1 :
+                            dv = ua.DataValue(ua.Variant(1200, ua.VariantType.Int16))
+                            dv.ServerTimestamp = None
+                            dv.SourceTimestamp = None
+                            temp_var.set_value(dv)
 
-                # elif df['DataType'][i] == 'REAL' :
-                #     dv = ua.DataValue(ua.Variant(1, ua.VariantType.Float))
-                #     dv.ServerTimestamp = None
-                #     dv.SourceTimestamp = None
-                #     temp_var.set_value(dv)
+                    # elif df['DataType'][i] == 'REAL' :
+                    #     dv = ua.DataValue(ua.Variant(1, ua.VariantType.Float))
+                    #     dv.ServerTimestamp = None
+                    #     dv.SourceTimestamp = None
+                    #     temp_var.set_value(dv)
+
+        sleep(0.5)
+
+
+        temp_var = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_BP_rearm_ESD"')
+        dv = ua.DataValue(ua.Variant(1, ua.VariantType.Boolean))
+        dv.ServerTimestamp = None
+        dv.SourceTimestamp = None
+        temp_var.set_value(dv)
+    print("rearm is called")
+        # sleep(0.5)
+        # for i in range(2386, len(df['NAME'])) :
+        #     temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+        #     print(i, temp_var, "==========>" , temp_var.get_value())
+
+def unknown() :
+    if clicked.get() == "ESD" and clicked_projects.get() == "HRS H2M" :
+        rearm()
+        global temp_var, temp_var_2, temp_var3, temp_var_4
+        temp_var = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_HSS_non_ATEX_Elec"')
+        dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+        dv.ServerTimestamp = None
+        dv.SourceTimestamp = None
+        temp_var.set_value(dv)
+
+        sleep(0.5)
+        
+        temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
+        temp_var_2 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DOF"."DOF_MEP_station_1"')
+        temp_var_3 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DOF"."DOF_MEP_station_2"')
+        temp_var_4 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DIF"."DIF_HSS_non_ATEX_Elec"')
+        
+        print(temp_var.get_value(), temp_var_2.get_value(), temp_var_3.get_value(), temp_var_4.get_value())
+        
+        if temp_var.get_value() == False and temp_var_4.get_value() == False : # and temp_var_2.get_value() == False and temp_var_3.get_value() == False and temp_var_4.get_value() == False :
+            rearm()
+
+        temp_var = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_CTRL_DIF_HSS_non_ATEX_Elec"')
+        dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+        dv.ServerTimestamp = None
+        dv.SourceTimestamp = None
+        temp_var.set_value(dv)
 
         sleep(0.5)
 
-        for i in range(2386, len(df['NAME'])) :
-            if df['NAME'][i] == 'DIF_BP_rearm_ESD' :
-                temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
-                dv = ua.DataValue(ua.Variant(1, ua.VariantType.Boolean))
-                dv.ServerTimestamp = None
-                dv.SourceTimestamp = None
-                temp_var.set_value(dv)
+
+
+        # temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
+        # if temp_var.get_value() == True :
+        #     temp_var2 = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_CTRL_DIF_HSS_non_ATEX_Elec"')
+        #     dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+        #     dv.ServerTimestamp = None
+        #     dv.SourceTimestamp = None
+        #     temp_var2.set_value(dv)
+
+        sleep(5)
+        temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DIF"."DIF_CTRL_DIF_HSS_non_ATEX_Elec"')
+        temp_var_2 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DIF"."DIF_HSS_non_ATEX_Elec"')
+        temp_var_3 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
+        print(temp_var.get_value(), temp_var_2.get_value(), temp_var_3.get_value())
+        if temp_var.get_value() == False and temp_var_2.get_value() == False and temp_var_3.get_value() == False :
+            print("IIIIII SUCCEEDED, yohoooooooooo")
+        pass
+
+def unknown_two() :
+    global temp_var, temp_var_2
+    if clicked.get() == "ESD" and clicked_projects.get() == "HRS H2M" :
+        rearm()
+        temp_var = client.get_node('ns=3;s="DB_SIMUL_AIF"."AIF"."AIF_D1_DG_H2_dispenser"')
+        dv = ua.DataValue(ua.Variant(30000, ua.VariantType.Int16))
+        dv.ServerTimestamp = None
+        dv.SourceTimestamp = None
+        temp_var.set_value(dv)
 
         sleep(0.5)
-        for i in range(2386, len(df['NAME'])) :
-            temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
-            print(i, temp_var, "==========>" , temp_var.get_value())
+
+        temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
+        temp_var_2 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_1oo1_AIF"."AIF_D1_DG_H2_dispenser"."Q_DEFAUT_HH"')
+        if temp_var.get_value() == False and temp_var_2.get_value() == True :
+            rearm()
+
+        temp_var = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_CTRL_AIF_D1_DG_H2_dispenser"')
+        dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+        dv.ServerTimestamp = None
+        dv.SourceTimestamp = None
+        temp_var.set_value(dv)
+
+        sleep(0.5)
+
+        temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
+        temp_var_2 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_1oo1_AIF"."AIF_D1_DG_H2_dispenser"."Q_DEFAUT_VOIE"')
+
+        if temp_var.get_value() == False and temp_var_2.get_value() == True :
+            print("Yoppppppppppeeeeeeeeeeeeee")
 
 def WriteDBlock(plc,DBlock,byte,bit,datatype,value):
     result = plc.read_area(areas['DB'],DBlock,byte,datatype)
@@ -418,7 +501,9 @@ label_var_max.set("Max value :")
 #Fourth subframe
 ESD_frame = LabelFrame(global_frame, text = "ESD", labelanchor="n", padx=40, pady=40)
 ESD_frame.config(width = 665, height = 150)
-rarmement = Button(ESD_frame, text="Rearmement", command=rearm, width=20)
+rearmement = Button(ESD_frame, text="Rearmement", command=rearm, width=20)
+test_steps = Button(ESD_frame, text="unknown", command=unknown, width=20)
+test_steps2 = Button(ESD_frame, text="unknown2", command=unknown_two, width=20)
 
 
 #OptionMenus
@@ -441,7 +526,10 @@ text_max_value.grid(row=1, column=4, padx=10)
 label_min_value.grid(row=0, column=2, padx=10)
 label_step_value.grid(row=0, column=3, padx=10)
 label_max_value.grid(row=0, column=4, padx=10)
-armement.grid(row=0, column=0)
+rearmement.grid(row=0, column=0, padx=10)
+test_steps.grid(row=0, column=1, padx=10)
+test_steps2.grid(row=0, column=2, padx=10)
+
 frame_plc.place(x=10, y=10)
 frame_buttons.place(x=300, y=10)
 frame_projects.place(x=200, y=200)
