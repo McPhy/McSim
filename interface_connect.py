@@ -277,7 +277,7 @@ def toggle_function() :
                             if df['DataType'][i] == "REAL" :
                                 WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 1)
 
-
+#Rearmement function
 def rearm() :
     if clicked.get() == "ESD" and clicked_projects.get() == "HRS H2M" :
         for i in range(len(df['NAME'])):
@@ -383,7 +383,7 @@ def unknown() :
         if temp_var.get_value() == False and temp_var_2.get_value() == False and temp_var_3.get_value() == False :
             print("IIIIII SUCCEEDED, yohoooooooooo")
         pass
-
+#comment
 def unknown_two() :
     global temp_var, temp_var_2
     if clicked.get() == "ESD" and clicked_projects.get() == "HRS H2M" :
