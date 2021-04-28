@@ -14,22 +14,29 @@ from snap7.util import *
 from snap7.snap7types import *
 from opcua import *
 from opcua import Client
-
-
-#export xlsx file to dataframe
-df = pd.read_excel('MCSIM APP Database.xlsx', sheet_name ='Sheet1', header=0)
-
-#main interface interface
-root = Tk()
-root.title("McSim Simulation APP")          # Add Tittle to Root Window
-root.iconbitmap(r'mcsimicon.ico')           # Logo Setup for Root Window
-#root.geometry("400x400")
-
-df = pd.read_excel(r'C:\Users\admin\Desktop\McSim\MCSIM APP Database.xlsx', sheet_name ='Sheet1', header=0)
+from tkinter import messagebox
 
 #global variabals
 myplc = None
 client = None
+temp_var = None
+temp_var_2 = None
+temp_var_3 = None
+temp_var_4 = None
+emergency_buttons = []
+emergency_buttons_list = []
+#export xlsx file to dataframe
+df = pd.read_excel(r'C:\Users\admin\Desktop\McSim\MCSIM APP Database.xlsx', sheet_name ='Sheet1', header=0)
+
+#main interface interface
+root = Tk()
+root.title("McSim Simulation APP")          # Add Tittle to Root Window
+root.iconbitmap(r'C:\Users\admin\Desktop\McSim\mcsimicon.ico')           # Logo Setup for Root Window
+#root.geometry("400x400")
+
+df = pd.read_excel(r'C:\Users\admin\Desktop\McSim\MCSIM APP Database.xlsx', sheet_name ='Sheet1', header=0)
+
+
 
 
 #a function to connect PLCs after pressing the connect button
@@ -83,143 +90,141 @@ def ramp_function() :
     CMD = 0
     tmp = True
     CMD_V = False
-    global var_fast_simulation
-    if var_fast_simulation.get() :
-            min_value = float(text_min_value.get())
-            step = float(text_step_value.get())
-            max_value = float(text_max_value.get())
-            range_inc = int((max_value - min_value)/step)
-            CMD = min_value
-            for y in range(1) :
-                if CMD <= max_value and tmp == 1:
-                    for x in range(0,range_inc + 1) :
-                        if CMD_V == False : CMD_V = True
-                        elif CMD_V == True : CMD_V = False
-                        for i in range(len(df['NAME'])):
-                            if clicked_projects.get() == "HRS H2M" :
-                                if clicked.get() == "BPCS/PSD" :
-                                    if df['H2M'][i] == "YES" :
-                                        if df['NAME'][i].find("CMD", 0, 3) != -1 :
-                                            if df['DataType'][i] == "REAL" :
-                                                WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
-                                            elif df['DataType'][i] == "BOOL" :
-                                                WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
-                                
-                                elif clicked.get() == "ESD" :
-                                    if df['PLC'][i] == 'ESD' :
-                                        if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
-                                            temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
-                                            if df['DataType'][i] == 'BOOL' :
-                                                    dv = ua.DataValue(ua.Variant(CMD_V, ua.VariantType.Boolean))
-                                                    dv.ServerTimestamp = None
-                                                    dv.SourceTimestamp = None
-                                                    temp_var.set_value(dv)
-
-                                            elif df['DataType'][i] == 'INT' :
-                                                    dv = ua.DataValue(ua.Variant(int(CMD), ua.VariantType.Int16))
-                                                    dv.ServerTimestamp = None
-                                                    dv.SourceTimestamp = None
-                                                    temp_var.set_value(dv)
-
-                                            elif df['DataType'][i] == 'REAL' :
-                                                    dv = ua.DataValue(ua.Variant(CMD, ua.VariantType.Float))
-                                                    dv.ServerTimestamp = None
-                                                    dv.SourceTimestamp = None
-                                                    temp_var.set_value(dv)
-                                            print(i, temp_var, "==========>" , temp_var.get_value())
-                            
-                            elif clicked_projects.get() == "HRS IP1" :
-                                if clicked.get() == "BPCS/PSD" :
-                                    if df['H2M'][i] == "YES" :
-                                        if df['NAME'][i].find("CMD", 0, 3) != -1 :
-                                            if df['DataType'][i] == "REAL" :
-                                                WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
-                                            elif df['DataType'][i] == "BOOL" :
-                                                WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
-                            
-                        if CMD == max_value : tmp = 0
-                        CMD = CMD + step
-
-                if CMD >= min_value and tmp == 0 :
-                    for x in range(0,range_inc + 1) :
-                        CMD = CMD - step
-                        if CMD_V == False : CMD_V = True
-                        elif CMD_V == True : CMD_V = False
-                        for i in range(len(df['NAME'])):
-                            if clicked_projects.get() == "HRS H2M" :
-                                if clicked.get() == "BPCS/PSD" :
-                                    if df['H2M'][i] == "YES" :
-                                        if df['NAME'][i].find("CMD", 0, 3) != -1 :
-                                            if df['DataType'][i] == "REAL" :
-                                                WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
-                                            elif df['DataType'][i] == "BOOL" :
-                                                WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
-                                if clicked.get() == "ESD" :
-                                    if df['PLC'][i] == 'ESD' :
-                                        if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
-                                            temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
-                                            if df['DataType'][i] == 'BOOL' :
-                                                    dv = ua.DataValue(ua.Variant(CMD_V, ua.VariantType.Boolean))
-                                                    dv.ServerTimestamp = None
-                                                    dv.SourceTimestamp = None
-                                                    temp_var.set_value(dv)
-
-                                            elif df['DataType'][i] == 'INT' :
-                                                    dv = ua.DataValue(ua.Variant(int(CMD), ua.VariantType.Int16))
-                                                    dv.ServerTimestamp = None
-                                                    dv.SourceTimestamp = None
-                                                    temp_var.set_value(dv)
-
-                                            elif df['DataType'][i] == 'REAL' :
-                                                    dv = ua.DataValue(ua.Variant(CMD, ua.VariantType.Float))
-                                                    dv.ServerTimestamp = None
-                                                    dv.SourceTimestamp = None
-                                                    temp_var.set_value(dv)
-                                            print(i, temp_var, "==========>" , temp_var.get_value())
-                            
-
-                            elif clicked_projects.get() == "HRS IP1" :
-                                if df['H2M'][i] == "YES" :
-                                    if df['NAME'][i].find("CMD", 0, 3) != -1 :
-                                        if df['DataType'][i] == "REAL" :
-                                            WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
-                                        elif df['DataType'][i] == "BOOL" :
-                                            WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
-                        if CMD == min_value : tmp = 1
-            if clicked.get() == "BPCS/PSD" :     
+    min_value = float(text_min_value.get())
+    step = float(text_step_value.get())
+    max_value = float(text_max_value.get())
+    range_inc = int((max_value - min_value)/step)
+    CMD = min_value
+    for y in range(1) :
+        if CMD <= max_value and tmp == 1:
+            for x in range(0,range_inc + 1) :
+                if CMD_V == False : CMD_V = True
+                elif CMD_V == True : CMD_V = False
                 for i in range(len(df['NAME'])):
-                    if df['NAME'][i].find("Mode", 0, 4) != -1 :
-                        WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 0)
-                    elif df['NAME'][i].find("CMD", 0, 3) != -1 :
-                        if df['DataType'][i] == "BOOL" :
-                                    WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 0)
-                        if df['DataType'][i] == "REAL" :
-                                    WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 0)
-            
-            if clicked.get() == "ESD" :
+                    if clicked_projects.get() == "HRS H2M" :
+                        if clicked.get() == "BPCS/PSD" :
+                            if df['H2M'][i] == "YES" :
+                                if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                                    if df['DataType'][i] == "REAL" :
+                                        WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
+                                    elif df['DataType'][i] == "BOOL" :
+                                        WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
+                        
+                        elif clicked.get() == "ESD" :
+                            if df['PLC'][i] == 'ESD' :
+                                if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
+                                    temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+                                    if df['DataType'][i] == 'BOOL' :
+                                            dv = ua.DataValue(ua.Variant(CMD_V, ua.VariantType.Boolean))
+                                            dv.ServerTimestamp = None
+                                            dv.SourceTimestamp = None
+                                            temp_var.set_value(dv)
+
+                                    elif df['DataType'][i] == 'INT' :
+                                            dv = ua.DataValue(ua.Variant(int(CMD), ua.VariantType.Int16))
+                                            dv.ServerTimestamp = None
+                                            dv.SourceTimestamp = None
+                                            temp_var.set_value(dv)
+
+                                    elif df['DataType'][i] == 'REAL' :
+                                            dv = ua.DataValue(ua.Variant(CMD, ua.VariantType.Float))
+                                            dv.ServerTimestamp = None
+                                            dv.SourceTimestamp = None
+                                            temp_var.set_value(dv)
+                                    print(i, temp_var, "==========>" , temp_var.get_value())
+                    
+                    elif clicked_projects.get() == "HRS IP1" :
+                        if clicked.get() == "BPCS/PSD" :
+                            if df['H2M'][i] == "YES" :
+                                if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                                    if df['DataType'][i] == "REAL" :
+                                        WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
+                                    elif df['DataType'][i] == "BOOL" :
+                                        WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
+                    
+                if CMD == max_value : tmp = 0
+                CMD = CMD + step
+
+        if CMD >= min_value and tmp == 0 :
+            for x in range(0,range_inc + 1) :
+                CMD = CMD - step
+                if CMD_V == False : CMD_V = True
+                elif CMD_V == True : CMD_V = False
                 for i in range(len(df['NAME'])):
-                    if df['PLC'][i] == 'ESD' :
-                        if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
-                            temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
-                            if df['DataType'][i] == 'BOOL' :
-                                dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
-                                dv.ServerTimestamp = None
-                                dv.SourceTimestamp = None
-                                temp_var.set_value(dv)
+                    if clicked_projects.get() == "HRS H2M" :
+                        if clicked.get() == "BPCS/PSD" :
+                            if df['H2M'][i] == "YES" :
+                                if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                                    if df['DataType'][i] == "REAL" :
+                                        WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
+                                    elif df['DataType'][i] == "BOOL" :
+                                        WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
+                        if clicked.get() == "ESD" :
+                            if df['PLC'][i] == 'ESD' :
+                                if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
+                                    temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+                                    if df['DataType'][i] == 'BOOL' :
+                                            dv = ua.DataValue(ua.Variant(CMD_V, ua.VariantType.Boolean))
+                                            dv.ServerTimestamp = None
+                                            dv.SourceTimestamp = None
+                                            temp_var.set_value(dv)
 
-                            elif df['DataType'][i] == 'INT' :
-                                dv = ua.DataValue(ua.Variant(0, ua.VariantType.Int16))
-                                dv.ServerTimestamp = None
-                                dv.SourceTimestamp = None
-                                temp_var.set_value(dv)
+                                    elif df['DataType'][i] == 'INT' :
+                                            dv = ua.DataValue(ua.Variant(int(CMD), ua.VariantType.Int16))
+                                            dv.ServerTimestamp = None
+                                            dv.SourceTimestamp = None
+                                            temp_var.set_value(dv)
 
-                            elif df['DataType'][i] == 'REAL' :
-                                dv = ua.DataValue(ua.Variant(0, ua.VariantType.Float))
-                                dv.ServerTimestamp = None
-                                dv.SourceTimestamp = None
-                                temp_var.set_value(dv)
-                            print(i, temp_var, "==========>" , temp_var.get_value())
-            
+                                    elif df['DataType'][i] == 'REAL' :
+                                            dv = ua.DataValue(ua.Variant(CMD, ua.VariantType.Float))
+                                            dv.ServerTimestamp = None
+                                            dv.SourceTimestamp = None
+                                            temp_var.set_value(dv)
+                                    print(i, temp_var, "==========>" , temp_var.get_value())
+                    
+
+                    elif clicked_projects.get() == "HRS IP1" :
+                        if df['H2M'][i] == "YES" :
+                            if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                                if df['DataType'][i] == "REAL" :
+                                    WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, CMD)
+                                elif df['DataType'][i] == "BOOL" :
+                                    WriteDBlock(myplc,1586, int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, CMD_V)
+                if CMD == min_value : tmp = 1
+    if clicked.get() == "BPCS/PSD" :     
+        for i in range(len(df['NAME'])):
+            if df['NAME'][i].find("Mode", 0, 4) != -1 :
+                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 0)
+            elif df['NAME'][i].find("CMD", 0, 3) != -1 :
+                if df['DataType'][i] == "BOOL" :
+                            WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 0)
+                if df['DataType'][i] == "REAL" :
+                            WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 0)
+    
+    if clicked.get() == "ESD" :
+        for i in range(len(df['NAME'])):
+            if df['PLC'][i] == 'ESD' :
+                if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
+                    temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+                    if df['DataType'][i] == 'BOOL' :
+                        dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+                        dv.ServerTimestamp = None
+                        dv.SourceTimestamp = None
+                        temp_var.set_value(dv)
+
+                    elif df['DataType'][i] == 'INT' :
+                        dv = ua.DataValue(ua.Variant(0, ua.VariantType.Int16))
+                        dv.ServerTimestamp = None
+                        dv.SourceTimestamp = None
+                        temp_var.set_value(dv)
+
+                    elif df['DataType'][i] == 'REAL' :
+                        dv = ua.DataValue(ua.Variant(0, ua.VariantType.Float))
+                        dv.ServerTimestamp = None
+                        dv.SourceTimestamp = None
+                        temp_var.set_value(dv)
+                    print(i, temp_var, "==========>" , temp_var.get_value())
+    
             
 
 
@@ -227,57 +232,55 @@ def ramp_function() :
 def toggle_function() :
     global myplc
     b = 0
-    global var_fast_simulation
-    if var_fast_simulation.get() :
-        if clicked_projects.get() == "HRS H2M" :
-            #set all the variables in the PLC BPCS/PSD to True
-            if clicked.get() == "BPCS/PSD" :
-                for i in range(len(df['NAME'])):
-                    if df['H2M'][i] == "YES" :
-                        if df['NAME'][i].find("Mode", 0, 4) != -1 :
+    if clicked_projects.get() == "HRS H2M" :
+        #set all the variables in the PLC BPCS/PSD to True
+        if clicked.get() == "BPCS/PSD" :
+            for i in range(len(df['NAME'])):
+                if df['H2M'][i] == "YES" :
+                    if df['NAME'][i].find("Mode", 0, 4) != -1 :
+                        WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
+                    if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                        if df['DataType'][i] == "BOOL" :
                             WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
-                        if df['NAME'][i].find("CMD", 0, 3) != -1 :
-                            if df['DataType'][i] == "BOOL" :
-                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
-                            if df['DataType'][i] == "REAL" :
-                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 1)
-            
-            #set all the variables in the PLC ESD to True
-            if clicked.get() == "ESD" :
-                for i in range(len(df['NAME'])):
-                    if df['PLC'][i] == 'ESD' :
-                        if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
-                            temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
-                            if df['DataType'][i] == 'BOOL' :
-                                    dv = ua.DataValue(ua.Variant(1, ua.VariantType.Boolean))
-                                    dv.ServerTimestamp = None
-                                    dv.SourceTimestamp = None
-                                    temp_var.set_value(dv)
+                        if df['DataType'][i] == "REAL" :
+                            WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 1)
+        
+        #set all the variables in the PLC ESD to True
+        if clicked.get() == "ESD" :
+            for i in range(len(df['NAME'])):
+                if df['PLC'][i] == 'ESD' :
+                    if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
+                        temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
+                        if df['DataType'][i] == 'BOOL' :
+                                dv = ua.DataValue(ua.Variant(1, ua.VariantType.Boolean))
+                                dv.ServerTimestamp = None
+                                dv.SourceTimestamp = None
+                                temp_var.set_value(dv)
 
-                            elif df['DataType'][i] == 'INT' :
-                                    dv = ua.DataValue(ua.Variant(1, ua.VariantType.Int16))
-                                    dv.ServerTimestamp = None
-                                    dv.SourceTimestamp = None
-                                    temp_var.set_value(dv)
+                        elif df['DataType'][i] == 'INT' :
+                                dv = ua.DataValue(ua.Variant(1, ua.VariantType.Int16))
+                                dv.ServerTimestamp = None
+                                dv.SourceTimestamp = None
+                                temp_var.set_value(dv)
 
-                            elif df['DataType'][i] == 'REAL' :
-                                    dv = ua.DataValue(ua.Variant(1, ua.VariantType.Float))
-                                    dv.ServerTimestamp = None
-                                    dv.SourceTimestamp = None
-                                    temp_var.set_value(dv)
+                        elif df['DataType'][i] == 'REAL' :
+                                dv = ua.DataValue(ua.Variant(1, ua.VariantType.Float))
+                                dv.ServerTimestamp = None
+                                dv.SourceTimestamp = None
+                                temp_var.set_value(dv)
 
-            if clicked_projects.get() == "HRS IP1" :
-                for i in range(len(df['NAME'])):
-                    if df['IP1'][i] == "YES" :
-                        if df['NAME'][i].find("Mode", 0, 4) != -1 :
+        if clicked_projects.get() == "HRS IP1" :
+            for i in range(len(df['NAME'])):
+                if df['IP1'][i] == "YES" :
+                    if df['NAME'][i].find("Mode", 0, 4) != -1 :
+                        WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
+                    if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                        if df['DataType'][i] == "BOOL" :
                             WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
-                        if df['NAME'][i].find("CMD", 0, 3) != -1 :
-                            if df['DataType'][i] == "BOOL" :
-                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
-                            if df['DataType'][i] == "REAL" :
-                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 1)
+                        if df['DataType'][i] == "REAL" :
+                            WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 1)
 
-#Rearmement function
+
 def rearm() :
     if clicked.get() == "ESD" and clicked_projects.get() == "HRS H2M" :
         for i in range(len(df['NAME'])):
@@ -329,62 +332,134 @@ def rearm() :
         dv.ServerTimestamp = None
         dv.SourceTimestamp = None
         temp_var.set_value(dv)
-    print("rearm is called")
+        sleep(0.5)
+    temp_var2 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
+    #print(temp_var2.get_value())
+    if temp_var2.get_value() == True :
+        rearmement.config(bg = "green")
+    else :
+        rearmement.config(bg = "red")
         # sleep(0.5)
         # for i in range(2386, len(df['NAME'])) :
         #     temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
         #     print(i, temp_var, "==========>" , temp_var.get_value())
 
-def unknown() :
+def stop_test() :
+    emrg_button = clicked_emrg_buttons.get()
+    for i in range(len(df['NAME'])):
+        if emrg_button == str(df['H2M PID']) :
+            if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
+                if df['Address Byte_OPC NODE'][i].find("CTRL") != -1 :
+                    sim_emerg_button_sig_status = client.get_node(df['Address Byte_OPC NODE'][i])
+                else :
+                    sim_emerg_button_sig = client.get_node(df['Address Byte_OPC NODE'][i])
+            elif df['Address Byte_OPC NODE'][i].find("CTRL") != -1 :
+                emerg_button_sig_status = client.get_node(df['Address Byte_OPC NODE'][i])
+            else :
+                emerg_button_sig = client.get_node(df['Address Byte_OPC NODE'][i])
+
+
     if clicked.get() == "ESD" and clicked_projects.get() == "HRS H2M" :
         rearm()
-        global temp_var, temp_var_2, temp_var3, temp_var_4
-        temp_var = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_HSS_non_ATEX_Elec"')
-        dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
-        dv.ServerTimestamp = None
-        dv.SourceTimestamp = None
-        temp_var.set_value(dv)
 
-        sleep(0.5)
-        
         temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
-        temp_var_2 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DOF"."DOF_MEP_station_1"')
-        temp_var_3 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DOF"."DOF_MEP_station_2"')
-        temp_var_4 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DIF"."DIF_HSS_non_ATEX_Elec"')
-        
-        print(temp_var.get_value(), temp_var_2.get_value(), temp_var_3.get_value(), temp_var_4.get_value())
-        
-        if temp_var.get_value() == False and temp_var_4.get_value() == False : # and temp_var_2.get_value() == False and temp_var_3.get_value() == False and temp_var_4.get_value() == False :
-            rearm()
+        if temp_var.get_value() == True :
+            print("script rearmement # 1 was called out successfully")
+            #temp_var = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_HSS_non_ATEX_Elec"')
+            dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+            dv.ServerTimestamp = None
+            dv.SourceTimestamp = None
+            sim_emerg_button_sig.set_value(dv)
+            sleep(0.5)
+            if temp_var.get_value() == False :
+                print ("Script Control Boucle Desarme was carried out successfully")
+                if emerg_button_sig .get_value() == False :
+                    print ("HSS Detected, HRS De-armement was carried out successfully")
+                    rearm()
+                    if temp_var.get_value() == True :
+                        print ("Script Rearmement # 2 was carried out successfully")
+                        dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+                        dv.ServerTimestamp = None
+                        dv.SourceTimestamp = None
+                        sim_emerg_button_sig_status.set_value(dv)
+                        sleep(0.5)
+                        if temp_var.get_value() == False :
+                            print ("Script Control Boucle Desarme was carried out successfully")
+                            if emerg_button_sig == False and emerg_button_sig_status == False :
+                                print ("Script HSS Test was carried out successfully without erros")
+                                button_e_stop.config(bg = "green")
+                            else :
+                                print ("Error # 6 Variabes DIF and CTRL HSS = 1 even after Calling Controle Boucle Desarme")
+                                button_e_stop.config(bg = "red")
+                                messagebox.showerror("Error", "Error # 6 Variabes DIF and CTRL HSS = 1 even after Calling Controle Boucle Desarme")
+                        else :
+                            print ("Error # 5 - Script Dearmed Error")
+                            button_e_stop.config(bg = "red")
+                            messagebox.showerror("Error", "Error # 5 - Script Dearmed Error")
+                    else :
+                        print ("Error # 4 - HRS Rearmement Error")
+                        button_e_stop.config(bg = "red")
+                        messagebox.showerror("Error","Error # 4 - HRS Rearmement Error")
+                else :
+                    print ("Error # 3 -Etat Securite HSS = 1 even after Calling Controle Boucle")
+                    button_e_stop.config(bg = "red")
+                    messagebox.showerror("Error","Error # 3 -Etat Securite HSS = 1 even after Calling Controle Boucle")
+            else :
+                print ("Error # 2 -Script Dearmed Error")
+                button_e_stop.config(bg = "red")
+                messagebox.showerror("Error","Error # 2 -Script Dearmed Error")
+        else :
+            print("Error # 1 - HRS Rearmement Error")
+            button_e_stop.config(bg = "red")
+            messagebox.showerror("Error","Error # 1 - HRS Rearmement Erro")
 
-        temp_var = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_CTRL_DIF_HSS_non_ATEX_Elec"')
-        dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
-        dv.ServerTimestamp = None
-        dv.SourceTimestamp = None
-        temp_var.set_value(dv)
-
-        sleep(0.5)
-
-
-
-        # temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
-        # if temp_var.get_value() == True :
-        #     temp_var2 = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_CTRL_DIF_HSS_non_ATEX_Elec"')
+        # #global temp_var, temp_var_2, temp_var3, temp_var_4
+        #     temp_var = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_HSS_non_ATEX_Elec"')
         #     dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
         #     dv.ServerTimestamp = None
         #     dv.SourceTimestamp = None
-        #     temp_var2.set_value(dv)
+        #     temp_var.set_value(dv)
 
-        sleep(5)
-        temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DIF"."DIF_CTRL_DIF_HSS_non_ATEX_Elec"')
-        temp_var_2 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DIF"."DIF_HSS_non_ATEX_Elec"')
-        temp_var_3 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
-        print(temp_var.get_value(), temp_var_2.get_value(), temp_var_3.get_value())
-        if temp_var.get_value() == False and temp_var_2.get_value() == False and temp_var_3.get_value() == False :
-            print("IIIIII SUCCEEDED, yohoooooooooo")
-        pass
-#comment
-def unknown_two() :
+        # sleep(0.5)
+        
+        # temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
+        # temp_var_2 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DOF"."DOF_MEP_station_1"')
+        # temp_var_3 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DOF"."DOF_MEP_station_2"')
+        # temp_var_4 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DIF"."DIF_HSS_non_ATEX_Elec"')
+        
+        # print(temp_var.get_value(), temp_var_2.get_value(), temp_var_3.get_value(), temp_var_4.get_value())
+        
+        # if temp_var.get_value() == False and temp_var_4.get_value() == False : # and temp_var_2.get_value() == False and temp_var_3.get_value() == False and temp_var_4.get_value() == False :
+        #     rearm()
+
+        # temp_var = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_CTRL_DIF_HSS_non_ATEX_Elec"')
+        # dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+        # dv.ServerTimestamp = None
+        # dv.SourceTimestamp = None
+        # temp_var.set_value(dv)
+
+        # sleep(0.5)
+
+
+
+        # # temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
+        # # if temp_var.get_value() == True :
+        # #     temp_var2 = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_CTRL_DIF_HSS_non_ATEX_Elec"')
+        # #     dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
+        # #     dv.ServerTimestamp = None
+        # #     dv.SourceTimestamp = None
+        # #     temp_var2.set_value(dv)
+
+        # sleep(5)
+        # temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DIF"."DIF_CTRL_DIF_HSS_non_ATEX_Elec"')
+        # temp_var_2 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."DIF"."DIF_HSS_non_ATEX_Elec"')
+        # temp_var_3 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
+        # print(temp_var.get_value(), temp_var_2.get_value(), temp_var_3.get_value())
+        # if temp_var.get_value() == False and temp_var_2.get_value() == False and temp_var_3.get_value() == False :
+        #     print("IIIIII SUCCEEDED, yohoooooooooo")
+        # pass
+
+def gaz_test() :
     global temp_var, temp_var_2
     if clicked.get() == "ESD" and clicked_projects.get() == "HRS H2M" :
         rearm()
@@ -398,7 +473,7 @@ def unknown_two() :
 
         temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
         temp_var_2 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_1oo1_AIF"."AIF_D1_DG_H2_dispenser"."Q_DEFAUT_HH"')
-        if temp_var.get_value() == False and temp_var_2.get_value() == True :
+        if temp_var.get_value() == True and temp_var_2.get_value() == True :
             rearm()
 
         temp_var = client.get_node('ns=3;s="DB_SIMUL_DIF"."DIF"."DIF_CTRL_AIF_D1_DG_H2_dispenser"')
@@ -412,8 +487,11 @@ def unknown_two() :
         temp_var = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_BOUCLE_PUISSANCE"."BOUCLE_ARMEE"')
         temp_var_2 = client.get_node('ns=3;s="DB_API_IHM_ETATS"."ETATS_1oo1_AIF"."AIF_D1_DG_H2_dispenser"."Q_DEFAUT_VOIE"')
 
-        if temp_var.get_value() == False and temp_var_2.get_value() == True :
+        if temp_var.get_value() == True and temp_var_2.get_value() == True :
             print("Yoppppppppppeeeeeeeeeeeeee")
+
+def ctrl_boucle_trip() :
+    pass
 
 def WriteDBlock(plc,DBlock,byte,bit,datatype,value):
     result = plc.read_area(areas['DB'],DBlock,byte,datatype)
@@ -452,6 +530,15 @@ concepts = ['Sensors',
 clicked_concepts = StringVar()
 clicked_concepts.set('Concepts')
 
+
+for i in range(len(df['NAME'])):
+    if str(df['H2M PID'][i]).find("HSS") != -1 :
+        emergency_buttons.append(df['H2M PID'][i])
+emergency_buttons_list = list(dict.fromkeys(emergency_buttons))
+clicked_emrg_buttons = StringVar()
+clicked_emrg_buttons.set('emergency buttons')
+
+
 #global frame that contains two subframes
 global_frame = LabelFrame(root, text="McSim", labelanchor="n", padx=10, pady=10)
 global_frame.config(width = 900, height = 570)
@@ -472,7 +559,7 @@ Connect = Button(frame_buttons, text="Connect",command=connect_plc, width=40)
 Disonnect = Button(frame_buttons, text="Disonnect", command=disconnect_plc, width=40)
 
 #Third subframe which contains the buttons
-frame_projects = LabelFrame(global_frame, labelanchor="n", padx=40, pady=40)
+frame_projects = LabelFrame(global_frame, text="BPCS", labelanchor="n", padx=40, pady=40)
 
 #frame_projects.config(width = 800, height = 300)
 toggle = Button(frame_projects, text="Toggle function", command=toggle_function, width=20)
@@ -480,9 +567,6 @@ ramp = Button(frame_projects, text="Ramp function", command=ramp_function, width
 text_min_value = Entry(frame_projects)
 text_max_value = Entry(frame_projects)
 text_step_value = Entry(frame_projects)
-var_fast_simulation = IntVar()
-fast_simulation = Checkbutton(global_frame, text = "Fast simulation", variable = var_fast_simulation)
-advanced_simulation = Checkbutton(global_frame, text = "Advanced simulation")
 
 # Entries' labels
 label_var_min = StringVar()
@@ -502,8 +586,9 @@ label_var_max.set("Max value :")
 ESD_frame = LabelFrame(global_frame, text = "ESD", labelanchor="n", padx=40, pady=40)
 ESD_frame.config(width = 665, height = 150)
 rearmement = Button(ESD_frame, text="Rearmement", command=rearm, width=20)
-test_steps = Button(ESD_frame, text="unknown", command=unknown, width=20)
-test_steps2 = Button(ESD_frame, text="unknown2", command=unknown_two, width=20)
+button_e_stop = Button(ESD_frame, text="E-Stop", command=stop_test, width=20)
+button_gaz_test = Button(ESD_frame, text="Test Gaz", command=gaz_test, width=20)
+button_bcl_trip = Button(ESD_frame, text="CTRL BCL TRIP", command=ctrl_boucle_trip, width=20)
 
 
 #OptionMenus
@@ -511,6 +596,8 @@ projects_menu = OptionMenu(global_frame, clicked_projects, *projects)
 projects_menu.config(width=20)
 concepts_menu = OptionMenu(global_frame, clicked_concepts, *concepts)
 concepts_menu.config(width=20)
+emerg_buttons_menu = OptionMenu(ESD_frame, clicked_emrg_buttons, *emergency_buttons_list)
+emerg_buttons_menu.config(width=20)
 
 
 
@@ -527,16 +614,15 @@ label_min_value.grid(row=0, column=2, padx=10)
 label_step_value.grid(row=0, column=3, padx=10)
 label_max_value.grid(row=0, column=4, padx=10)
 rearmement.grid(row=0, column=0, padx=10)
-test_steps.grid(row=0, column=1, padx=10)
-test_steps2.grid(row=0, column=2, padx=10)
-
+button_e_stop.grid(row=0, column=1, padx=10)
+button_gaz_test.grid(row=0, column=2, padx=10)
+emerg_buttons_menu.grid(row=1, column=1, padx=10)
+button_bcl_trip.grid(row=1, column=0, padx=10)
 frame_plc.place(x=10, y=10)
 frame_buttons.place(x=300, y=10)
 frame_projects.place(x=200, y=200)
 projects_menu.place(x=10, y=200)
 concepts_menu.place(x=10, y=375)
-fast_simulation.place(x=200, y=170)
-advanced_simulation.place(x=200, y=350)
 ESD_frame.place(x=200, y=370)
 
 root.mainloop()
