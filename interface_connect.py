@@ -25,6 +25,7 @@ temp_var_3 = None
 temp_var_4 = None
 emergency_buttons = []
 emergency_buttons_list = []
+b = 0
 #export xlsx file to dataframe
 df = pd.read_excel(r'C:\Users\admin\Desktop\McSim\MCSIM APP Database.xlsx', sheet_name ='Sheet1', header=0)
 
@@ -231,19 +232,29 @@ def ramp_function() :
 #Toggle function call if the the button toggle function is pusshed
 def toggle_function() :
     global myplc
-    b = 0
+    global b
+    b = b + 1
     if clicked_projects.get() == "HRS H2M" :
         #set all the variables in the PLC BPCS/PSD to True
         if clicked.get() == "BPCS/PSD" :
             for i in range(len(df['NAME'])):
                 if df['H2M'][i] == "YES" :
-                    if df['NAME'][i].find("Mode", 0, 4) != -1 :
-                        WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
-                    if df['NAME'][i].find("CMD", 0, 3) != -1 :
-                        if df['DataType'][i] == "BOOL" :
+                    if b % 2 == 1 :
+                        if df['NAME'][i].find("Mode", 0, 4) != -1 :
                             WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
-                        if df['DataType'][i] == "REAL" :
-                            WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 1)
+                        if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                            if df['DataType'][i] == "BOOL" :
+                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 1)
+                            if df['DataType'][i] == "REAL" :
+                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 1)
+                    elif b % 2 == 0 :
+                        if df['NAME'][i].find("Mode", 0, 4) != -1 :
+                            WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 0)
+                        if df['NAME'][i].find("CMD", 0, 3) != -1 :
+                            if df['DataType'][i] == "BOOL" :
+                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLBit, 0)
+                            if df['DataType'][i] == "REAL" :
+                                WriteDBlock(myplc,1586,int(df['Address Byte_OPC NODE'][i]), int(df['Address Bit'][i]), S7WLReal, 0)
         
         #set all the variables in the PLC ESD to True
         if clicked.get() == "ESD" :
@@ -252,22 +263,29 @@ def toggle_function() :
                     if df['Address Byte_OPC NODE'][i].find("SIMUL") != -1 :
                         temp_var = client.get_node(df['Address Byte_OPC NODE'][i])
                         if df['DataType'][i] == 'BOOL' :
+                            if b % 2 == 1 :
                                 dv = ua.DataValue(ua.Variant(1, ua.VariantType.Boolean))
                                 dv.ServerTimestamp = None
                                 dv.SourceTimestamp = None
                                 temp_var.set_value(dv)
-
-                        elif df['DataType'][i] == 'INT' :
-                                dv = ua.DataValue(ua.Variant(1, ua.VariantType.Int16))
+                                print(temp_var.get_value())
+                            elif b % 2 == 0 :
+                                dv = ua.DataValue(ua.Variant(0, ua.VariantType.Boolean))
                                 dv.ServerTimestamp = None
                                 dv.SourceTimestamp = None
                                 temp_var.set_value(dv)
+                                print(temp_var.get_value())
+                        # elif df['DataType'][i] == 'INT' :
+                        #         dv = ua.DataValue(ua.Variant(1, ua.VariantType.Int16))
+                        #         dv.ServerTimestamp = None
+                        #         dv.SourceTimestamp = None
+                        #         temp_var.set_value(dv)
 
-                        elif df['DataType'][i] == 'REAL' :
-                                dv = ua.DataValue(ua.Variant(1, ua.VariantType.Float))
-                                dv.ServerTimestamp = None
-                                dv.SourceTimestamp = None
-                                temp_var.set_value(dv)
+                        # elif df['DataType'][i] == 'REAL' :
+                        #         dv = ua.DataValue(ua.Variant(1, ua.VariantType.Float))
+                        #         dv.ServerTimestamp = None
+                        #         dv.SourceTimestamp = None
+                        #         temp_var.set_value(dv)
 
         if clicked_projects.get() == "HRS IP1" :
             for i in range(len(df['NAME'])):
