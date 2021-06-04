@@ -189,12 +189,12 @@ IDsGsheet = {1:[1,"ALM_MOT","Mot contenant les alarmes"],
 
 while True:     # Main Program LOOP
 
-	# HRS CNR
+	# HRS Rouen
 	try:
 
-		# -x-x-x-x-x-x-x-x--x-x-x-x-x--x-x-x-x-x-x-  HRS CNR -x-x-x-x-x-x-x--x-x-x-x-x-x-x-x-x-x-x-x-x-x
+		# -x-x-x-x-x-x-x-x--x-x-x-x-x--x-x-x-x-x-x-  HRS Rouen -x-x-x-x-x-x-x--x-x-x-x-x-x-x-x-x-x-x-x-x-x
 		#----Obtain las Transaction ID  -------------------------------------------------------------------------------
-		sh = gc.open_by_key('10Ik_0gKeW-_rbwFFTn8e2xhtpL_wFAvtEZj4AVFkc4Q')     # HRS CNR- Gsheet ApiKey. 
+		sh = gc.open_by_key('10Ik_0gKeW-_rbwFFTn8e2xhtpL_wFAvtEZj4AVFkc4Q')     # HRS Rouen- Gsheet ApiKey. 
 		Transactionsheet = sh.get_worksheet(0)                                  # Open Tab 0 From Speadsheet choosed.
 		StartingTransactionID = Transactionsheet.cell(1,2).value                # Get Value from SpreadSheet Tab 0 Cells (1,2)
 		LastTransactionSTR = str(StartingTransactionID)                         # Convert to value to type String.
@@ -214,33 +214,33 @@ while True:     # Main Program LOOP
 		print('-----------------------------------')
 		#Transaction ID Data mailbox
 		TransactionID = respuestajson.get('transactionId')          # Get new Tansaction ID from the ewon API request.
-		LastTransactionSTR = str(TransactionID)                     # 
-		print('Transaction ID: ' + str(TransactionID))
-		Transactionsheet = sh.get_worksheet(0)
-		Transactionsheet.update_cell(1,2, TransactionID)
+		LastTransactionSTR = str(TransactionID)                     # Convert Variable to String
+		print('Transaction ID: ' + str(TransactionID))				# Print Variable
+		Transactionsheet = sh.get_worksheet(0)						# Select Spread sheet Tab
+		Transactionsheet.update_cell(1,2, TransactionID)			# Write in Spread sheet Tab 0 cell 1,2 -- New transaction Number
 
 		#Flag.. More Data Available?
-		FLAGMoreData = respuestajson.get('moreDataAvailable')
-		print('More Data Available: ' + str(FLAGMoreData))
-		if FLAGMoreData == True:
-			MoreNewData = 1
+		FLAGMoreData = respuestajson.get('moreDataAvailable')	    # If There is a new packet to call, moreDataAvailable = 1 if no = 0
+		print('More Data Available: ' + str(FLAGMoreData))			# print Variable
+		if FLAGMoreData == True:									# IF Previous Tag = 1, we set Internal Tag "MoreNewData" to 1
+			MoreNewData = 1											# Set tag "MoreNewData" to 1
 		#Ewon tags inside Reponse 
-		ewonTags = respuestajson.get('ewons')[0].get('tags')
-		range_ewontagsinResponse = len(ewonTags)
-		contador = range_ewontagsinResponse
-		print('Response Lenght: '+ str(range_ewontagsinResponse))
-		print('-----------------------------------')
-		print('\n')
+		ewonTags = respuestajson.get('ewons')[0].get('tags')		# Select Ewon To Grab Data... This is Always 0 since we have 1 eWon per HRS
+		range_ewontagsinResponse = len(ewonTags)					# Obtain the Lenght of Data inside the Json Package
+		contador = range_ewontagsinResponse							# Give Lenght Value to tag "Contador" 
+		print('Response Lenght: '+ str(range_ewontagsinResponse))	# print Lenght of Data inside Json Package
+		print('-----------------------------------')				# print Separation Lines
+		print('\n')													# print Jump Line
 
 
-		for x in range(0,range_ewontagsinResponse):
-			sleep(2.5)
-			print('--------------------')
-			ix = respuestajson.get('ewons')[0].get('tags')[x]
-			print('\n')
-			Mcview_TagID = ix['ewonTagId']
-			print('Mcview TagID: ' + str(Mcview_TagID))
-			print('Loop #: ' + str(contador))
+		for x in range(0,range_ewontagsinResponse):					# For LOOP from 0 to Lenght of Data Recived inside Json Package
+			sleep(2.5)												# Sleep 2.5 sec
+			print('--------------------')							# print Jump Line
+			ix = respuestajson.get('ewons')[0].get('tags')[x]		# ix --> store Tag X from ewon 0 
+			print('\n')												# print Jump Line
+			Mcview_TagID = ix['ewonTagId']							# Set eWon TAGID to "McView_TagID" Variable... This will Help to identify it from our Exchange Table.
+			print('Mcview TagID: ' + str(Mcview_TagID))				# print Variable "Mcview TagID"
+			print('Loop #: ' + str(contador))						# Prin value from our FOR LOOP
 
 			#### --- availability Report --- ####
 			if Mcview_TagID == 417:
@@ -261,13 +261,12 @@ while True:     # Main Program LOOP
 				df['date'] = pd.to_datetime(df.date)
 				df['Hour'] = df.date.dt.hour
 				df['Month'] = df.date.dt.month
-				df['Day'] = df.date.dt.day
 				df['Tagname'] = TabName_Gsheet
 				df['Extrainfo'] = DescriptionTag
 				
 				df.rename(columns = {'value':'Value'}, inplace=True)
 				df.rename(columns = {'date':'TimeStr'}, inplace=True)
-				custom_sort = ['Value', 'TimeStr', 'TagId', 'Hour', 'Tagname', 'Day','Extrainfo']
+				custom_sort = ['Value', 'TimeStr', 'TagId', 'Hour', 'Tagname', 'Month','Extrainfo']
 
 
 				print('Index #: ' + str(IndexNumber))
@@ -360,10 +359,6 @@ while True:     # Main Program LOOP
 			Authentication = {'t2mdevid': '87e76678-d393-4bdc-88a4-08cf164b4944','t2mtoken': 'w0DRk9x2GuYXOERMAUUUNc0PDaJRI6Xf0CkDgGbjSONvx5ilQA', 'createTransaction':'true','lastTransactionId':LastTransactionSTR}
 			respuesta = requests.post('https://data.talk2m.com/syncdata', data=Authentication)
 			respuestajson = respuesta.json()
-			#pprint.pprint(respuestajson)
-
-			#print(respuesta.text)
-
 
 
 			print('-----------------------------------')
@@ -394,7 +389,6 @@ while True:     # Main Program LOOP
 				sleep(2.5)
 				print('--------------------')
 				ix = respuestajson.get('ewons')[0].get('tags')[x]
-				#pprint.pprint(ix)
 				print('\n')
 				Mcview_TagID = ix['ewonTagId']
 				print('Mcview TagID: ' + str(Mcview_TagID))
@@ -420,13 +414,12 @@ while True:     # Main Program LOOP
 					df['date'] = pd.to_datetime(df.date)
 					df['Hour'] = df.date.dt.hour
 					df['Month'] = df.date.dt.month
-					df['Day'] = df.date.dt.day
 					df['Tagname'] = TabName_Gsheet
 					df['Extrainfo'] = DescriptionTag
 				
 				df.rename(columns = {'value':'Value'}, inplace=True)
 				df.rename(columns = {'date':'TimeStr'}, inplace=True)
-				custom_sort = ['Value', 'TimeStr', 'TagId', 'Hour', 'Tagname', 'Day','Extrainfo']
+				custom_sort = ['Value', 'TimeStr', 'TagId', 'Hour', 'Tagname', 'Month','Extrainfo']
 				print('Index #: ' + str(IndexNumber))
 
 				if IndexNumber != 99:
@@ -509,7 +502,6 @@ while True:     # Main Program LOOP
 		print('\n')
 		pass
 
-	sleep(10)
 
 
 	# ---------------------    Wave Exit  ---------------------------
@@ -530,5 +522,4 @@ while True:     # Main Program LOOP
 	sleep(60)
 	print('Data Wave Initialization')
 	emailAlertMEMO = 0
-	#input("Press enter to exit") # Wait in terminal before closing
 	# #XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
